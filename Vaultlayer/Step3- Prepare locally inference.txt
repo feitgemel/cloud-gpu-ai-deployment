@@ -1,0 +1,81 @@
+1. AFter the train: (example result)
+
+ ***** test metrics *****
+    epoch                   =     5.0314
+    eval_accuracy           =      0.917
+    eval_loss               =     0.2362
+    eval_runtime            = 0:00:01.23
+    eval_samples_per_second =    214.821
+    eval_steps_per_second   =     27.562
+  Sample predictions saved to /workspace/checkpoints/fc945d92-fafa-489d-add0-cf7058edbe78/predictions_sample.png
+
+------------------------------------------------------
+The example folder name : fc945d92-fafa-489d-add0-cf7058edbe78
+------------------------------------------------------
+
+
+2. Download the results ( weights and png file ):
+
+vl download <folder name>
+vl download fc945d92-fafa-489d-add0-cf7058edbe78
+
+
+3. Here is the log result :
+
+Downloading files for job fc945d92-fafa-489d-add0-cf7058edbe78
+  Output: vaultlayer-results/fc945d92-fafa-489d-add0-cf7058edbe78
+  ... 10 files downloaded
+  ... 20 files downloaded
+  ... 30 files downloaded
+  ... 40 files downloaded
+  ... 50 files downloaded
+  ... 60 files downloaded
+  ... 70 files downloaded
+  ... 80 files downloaded
+  Done: 85 files (4914.0 MB) → vaultlayer-results/fc945d92-fafa-489d-add0-cf7058edbe78
+
+
+
+4. Open the image file "predictions_sample.png" and look at the result
+
+
+5. Install more packages for the test runtim (After the train):
+
+5.1 Install Pytorch 2.5.0:
+
+    If you do not have GPU :
+    # CPU only
+    pip install torch==2.5.0 torchvision==0.20.0 torchaudio==2.5.0 --extra-index-url https://download.pytorch.org/whl/cpu
+
+    If you have a Gpu card :
+    Find your Cuda version for the local Pytorch install 
+
+    nvcc --version 
+
+    Sample result :
+    nvcc: NVIDIA (R) Cuda compiler driver
+    Copyright (c) 2005-2024 NVIDIA Corporation
+    Built on Thu_Sep_12_02:18:05_PDT_2024
+    Cuda compilation tools, release 12.6, V12.6.77
+    Build cuda_12.6.r12.6/compiler.34841621_0
+
+    For cuda 12.6 you should download the last support version 12.4:
+    # CUDA 12.4
+    conda install pytorch==2.5.0 torchvision==0.20.0 torchaudio==2.5.0 pytorch-cuda=12.4 -c pytorch -c nvidia
+    pip install torch==2.5.0 torchvision==0.20.0 torchaudio==2.5.0 --extra-index-url https://download.pytorch.org/whl/cu124
+
+
+5.2 Install more packages:
+
+    pip install matplotlib
+    pip install transformers==4.46.2
+
+
+
+6. From the working folder , run Vscode 
+code . 
+Choose the conda enviroment using :
+<cntl> + <shift> + p , Select interpertoer and chose : "vaultlayer_cards"
+
+
+

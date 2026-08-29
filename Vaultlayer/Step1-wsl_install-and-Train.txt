@@ -1,0 +1,111 @@
+
+==================================================================
+
+link to the platform : https://vaultlayer.cloud/?ref=d30a7bda1faf
+
+==================================================================
+
+
+0: Download the Dataset
+https://www.kaggle.com/datasets/gpiosenka/cards-image-datasetclassification
+
+
+Make sure the sturcture is :
+
+cards_dataset/
+├── train/
+└── test/
+└── valid/
+
+
+1. Environment Setup in Anaconda Prompt 
+
+# Run PowerShell and wsl for Linux envoriment 
+
+Run poweshell
+wsl
+
+
+conda create -n vaultlayer_cards python=3.11 -y
+conda activate vaultlayer_cards
+
+
+
+2. Install the VaultLayer CLI tool:
+pip install vaultlayer
+
+
+
+3. Perform a one-time account authentication (this will launch your browser to authenticate):
+
+Goto https://vaultlayer.cloud/
+Generate Token : vl_live_c1de19axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Run this in the terminal:
+vaultlayer init
+
+
+4. Preparing Project Files
+
+Create a dedicated project directory on your local system
+ (e.g., C:\tutorials\VaultLayer_vit_cards_project) :
+
+Go to c:/tutorials
+mkdir VaultLayer_vit_cards_project
+cd VaultLayer_vit_cards_project
+
+- Copy the dataset (images) to the working wolder and name it "cards_dataset"
+- Copy the following two files to the working folder:
+
+- requirements.txt
+- train.py
+- Step2.txt
+- Step3-Test-The-Model-6-random-images.py
+
+
+
+#5. Dataset Upload & Remote Execution
+
+vl sync ./cards_dataset --dataset-id cards_v3
+
+------------
+The example output : 
+
+VaultLayer Sync -- Neutral Zone Upload
+----------------------------------------
+
+  Source:      ./cards_dataset
+  Dataset ID:  cards_v3
+  Files:       8,154
+  Size:        160.32 MB
+  Destination: r2://vaultlayer-checkpoints/datasets/65bcbc4e-566d-483c-b891-10707adbe307/cards_v3/
+
+  Upload complete!
+  ----------------------------------------
+  Shards:   1
+  Size:     174.96 MB
+  Time:     127.7s (0.01 Gbps)
+  Storage:  ~$0.003/month
+  Dataset version: v-c0340c387bde
+  Manifest: r2://vaultlayer-checkpoints/datasets/65bcbc4e-566d-483c-b891-10707adbe307/cards_v3/manifest.json
+
+  To use in training:
+    vaultlayer run --data r2://cards_v3 train.py
+
+  Your dataset is now accessible from any cloud provider with zero egress fees.
+
+----------------------------------------
+
+6. Submit the Training Job:
+
+# Train (Run the code) :
+
+vl run --data cards_v3 Step2-train.py
+
+
+
+#You can set a hard spend threshold in USD for the run. If training spend reaches this limit, VaultLayer auto-cancels the job:
+
+vl run --max-cost 10 --data cards_v2 Step1-train.py
+(In this example, the job automatically stops if spend reaches $10).
+----------------------------------------------------------------------------

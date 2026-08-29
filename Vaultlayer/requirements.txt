@@ -1,0 +1,10 @@
+torch==2.5.0
+torchvision==0.20.0
+torchaudio==2.5.0
+sympy==1.13.1
+transformers==4.46.2
+accelerate==0.34.2
+opencv-python-headless==4.10.0.84
+scikit-learn
+evaluate
+matplotlib==3.9.3
