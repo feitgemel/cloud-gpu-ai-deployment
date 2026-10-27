@@ -1,0 +1,173 @@
+# Comprehensive Guide: Training and Deploying a PCB Defect Detection Model using Runpod and YOLO
+
+This guide provides an end-to-end walkthrough for training a high-performance **PCB Defect Detection** model on **Runpod GPU Cloud** (without Docker) and transferring the resulting weights for local evaluation on test sets (including WebP and standard formats).
+
+Sign up with Runpod at https://runpod.io?ref=a2x9g8hl to access GPU resources.
+
+---
+
+## Step 1. Prerequisites & Local Dataset Preparation
+
+Before moving to the cloud, prepare your dataset structure and configuration.
+
+### 1.1 Dataset Structure
+Organize your dataset locally as follows:
+
+pcb-defect-dataset/
+├── train/
+│   ├── images/
+│   └── labels/
+├── val/
+│   ├── images/
+│   └── labels/
+├── test/
+│   ├── images/
+│   └── labels/
+└── data.yaml
+
+
+### 1.2 Remote data.yaml Configuration
+For Runpod execution, directory paths must align with the persistent /workspace environment. 
+Configure your "data.yaml" as follows:
+
+path: /workspace/data/pcb-defect-dataset
+train: train
+val: val
+test: test
+
+names:
+  0: mouse_bite
+  1: spur
+  2: missing_hole
+  3: short
+  4: open_circuit
+  5: spurious_copper
+
+
+### 1.3 Archive the Dataset
+To avoid uploading thousands of individual image files through a browser, compress the directory into a single archive:
+On Windows, compress pcb-defect-dataset into pcb-defect-dataset.zip.
+Ensure that data.yaml is included inside the archive.
+
+
+# Step 2: Pod Configuration & Deployment (Runpod Console)
+
+#2.1 Step 2: Pod Configuration & Deployment (Runpod Console)
+  1. Log in to your Runpod Console.
+
+  2. Navigate to Pods -> click Deploy Pod.
+
+  3. Enter Pod Name -> "yolo-pcb-trainer"
+
+  4. Confirm Base Template: 
+
+    Verify that the selected template displayed at the top is:
+
+    Runpod Pytorch 2.8.0 (runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404).
+
+    This image includes CUDA 12.8, PyTorch 2.8, and Ubuntu 24.04 pre-configured, removing any need for manual Docker builds.
+
+  5. Select Target GPU :
+
+    Choose the GPU configuration based on your budget and workload:
+
+    - Best Value Option (Recommended):
+
+    RTX A5000 at $0.27/hr (24GB VRAM). or RTX 3090 at $0.50/hr (24GB VRAM).
+
+    Offers 24GB of memory at the lowest cost, which is sufficient for batch=32 and fast YOLO training.
+
+    - Maximum Throughput Option:
+
+    RTX 4090 at $0.89/hr (24GB VRAM, 125GB RAM, 16 vCPUs) or A40 at $0.59/hr (48GB VRAM).
+
+    Delivers higher iteration speeds due to Ada Lovelace / Ampere compute bandwidth.
+
+
+    6. Add Persistent Storage:
+
+    Click the "Add volume" link/button (or scroll down to the Persistent Storage / Volume Disk section).
+
+    Choose "Volume disk" and set the size to 50 GB.
+
+    Verify that the Mount Path is set to: /workspace.  (The default mount path is /workspace, which is suitable for our use case).
+
+    (This ensures that your datasets, code, and trained weights are saved to persistent disk storage rather than the ephemeral Container Disk, preventing data loss when the Pod stops).
+
+
+   7.  Verify Disk Allocation & Launch
+    In the Deploying summary box, verify that Total disk is set to at least 30 GB – 50 GB.
+
+    Click the final deployment button: Deploy Pod (or Deploy On-Demand).
+
+    Wait approximately 30 to 60 seconds until the status under My Pods switches to Running,
+
+
+# Step 3 . Upload Dataset to Runpod Persistent Storage
+
+
+    8.Connect to JupyterLab
+    In the Runpod Pods dashboard, locate your running Pod.
+
+    Click the Connect button.
+
+    In the connection dialog, select Connect to JupyterLab to launch the interface in a new browser tab.
+
+    9.Upload the Compressed Dataset
+
+      In the JupyterLab file explorer (left sidebar), ensure you are in the root /workspace directory.
+      Click the Upload Files icon (upward-pointing arrow) on the toolbar.
+      Select your local archive file: pcb-defect-dataset.zip.   
+      Wait for the upload process to complete. Follow the blue progress bar at the bottom of the JupyterLab 
+
+
+    10. Open Terminal, Extract Files, and Install Dependencies :
+
+      In JupyterLab, navigate to File -> New -> Terminal (or open it from the main Launcher).
+
+      Execute the following commands to install unzip, create the data directory, and extract the dataset:
+
+      - Bash :
+
+      cd /workspace
+      apt-get update && apt-get install -y unzip
+      mkdir -p /workspace/data
+      unzip pcb-defect-dataset.zip -d /workspace/data/
+
+
+      - Verify that data.yaml is present at the target location:
+      ls -la /workspace/data/pcb-defect-dataset/
+
+      - Install the required YOLO and computer vision packages:
+      pip install --upgrade pip
+      pip install ultralytics==8.4.179
+
+
+    Step 4 : Train 
+    
+    11. Upload training script (train_runpod.py) to /workspace directory:
+      In the file browser on the left panel, make sure you are in the root directory (the top level showing /workspace).
+      
+      In JupyterLab, click the Upload Files icon again and select your local train_runpod.py file.
+      Ensure that train_runpod.py is now present in the /workspace directory.
+
+    12. Run the code from the console :
+    
+        
+        cd /workspace
+        python train_runpod.py
+
+
+    Step 5 : Download the trained weights for local evaluation
+    
+    - Open the JupyterLab file browser in the left sidebar.
+    - Navigate to: 
+          /workspace/runs/pcb_train/runpod_pcb_exp/weights/
+
+    - Locate the two checkpoint files:
+
+      best.pt: Weights corresponding to the highest validation score (target deliverable).
+
+    - Right-click on best.pt and select Download to save the file locally.
+
+    
